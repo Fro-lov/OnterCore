@@ -22,7 +22,7 @@ public class PlayerAnalyticsListener {
         // Check Maintenance Mode
         if (ServerStateManager.isMaintenanceActive()) {
             int bypassLevel = OnterConfig.INSTANCE.maintenancePermissionLevel.get();
-            if (!player.hasPermissions(bypassLevel)) {
+            if (!com.onter.ontercore.core.permission.ModPermissions.canBypassMaintenance(player, bypassLevel)) {
                 String kickMsg = OnterConfig.INSTANCE.maintenanceKickMessage.get().replace("&", "§");
                 player.connection.disconnect(Component.literal(kickMsg));
                 return;

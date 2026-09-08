@@ -36,17 +36,27 @@
 
 ---
 
-## 💻 Команды и права (Permissions)
+## 💻 Команды и права (LuckPerms / NeoForge Permissions)
 
-| Команда | Описание | Мин. уровень прав |
-| :--- | :--- | :--- |
-| `/onter info <ник\|UUID>` | Выводит подробное интерактивное досье игрока (онлайн, IP, координаты с кнопкой `[Телепорт]`, историю команд) | OP (Уровень 2) |
-| `/onter status` | Показывает текущий TPS, MSPT, аптайм, память RAM и статус подключения к MySQL | OP (Уровень 2) |
-| `/onter maintenance <on\|off\|toggle\|status>` | Управление режимом техработ | OP (Уровень 2) |
-| `/onter broadcast <сообщение>` | Моментальная отправка системного анонса всем игрокам в чат | OP (Уровень 2) |
-| `/onter reload` | Горячая перезагрузка конфигурации, базы данных и таймеров | OP (Уровень 2) |
+Все команды и возможности мода интегрированы в стандартную систему прав NeoForge и полностью совместимы с плагином/модом **[LuckPerms](https://luckperms.net/)**. Вы можете выдавать права группам (`lp group admin permission set ...`) или отдельным игрокам.
 
-> 💡 **Алиас:** Для удобства вместо `/onter` можно использовать сокращение `/oc` (например, `/oc info Steve`).
+| Команда / Действие | Право (Permission Node) | Описание | По умолчанию |
+| :--- | :--- | :--- | :--- |
+| `/onter` / `/oc` | `ontercore.command.base` | Базовый доступ к корневой команде и справке | OP (Уровень 2) |
+| `/onter info <ник\|UUID>` | `ontercore.command.info` | Просмотр детального досье игрока (IP, координаты, телепорт, команды) | OP (Уровень 2) |
+| `/onter status` | `ontercore.command.status` | Просмотр TPS, MSPT, аптайма, ОЗУ и статуса MySQL | OP (Уровень 2) |
+| `/onter maintenance ...` | `ontercore.command.maintenance` | Управление режимом техработ сервера | OP (Уровень 2) |
+| `/onter broadcast <текст>` | `ontercore.command.broadcast` | Отправка мгновенных системных анонсов в чат | OP (Уровень 2) |
+| `/onter reload` | `ontercore.command.reload` | Горячая перезагрузка конфигурации, модулей и БД | OP (Уровень 2) |
+| *Обход техработ* | `ontercore.bypass.maintenance` | Разрешает подключаться к серверу во время техработ | OP (Уровень 2) |
+
+> 💡 **Пример выдачи прав в LuckPerms:**
+> ```bash
+> /lp group admin permission set ontercore.command.info true
+> /lp group admin permission set ontercore.bypass.maintenance true
+> ```
+> 
+> 💡 **Алиас:** Вместо `/onter` можно использовать короткую команду `/oc` (например, `/oc info Steve`).
 
 ---
 

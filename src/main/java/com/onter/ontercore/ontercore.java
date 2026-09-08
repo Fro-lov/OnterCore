@@ -77,6 +77,7 @@ public class ontercore {
 
         // Register core event handlers
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.register(new com.onter.ontercore.core.permission.ModPermissions());
         NeoForge.EVENT_BUS.register(new PlayerAnalyticsListener());
         NeoForge.EVENT_BUS.register(new AnnouncementTicker());
         NeoForge.EVENT_BUS.register(new ServerStateManager());

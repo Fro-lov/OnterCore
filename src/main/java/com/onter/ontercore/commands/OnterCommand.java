@@ -30,26 +30,33 @@ public class OnterCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var onterNode = Commands.literal("onter")
-                .requires(source -> source.hasPermission(2))
+                .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_BASE, 2))
                 .executes(OnterCommand::showHelp)
                 .then(Commands.literal("info")
+                        .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_INFO, 2))
                         .then(Commands.argument("target", StringArgumentType.word())
                                 .executes(OnterCommand::executeInfo)))
                 .then(Commands.literal("status")
+                        .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_STATUS, 2))
                         .executes(OnterCommand::executeStatus))
                 .then(Commands.literal("maintenance")
+                        .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_MAINTENANCE, 2))
                         .then(Commands.literal("on").executes(ctx -> setMaintenance(ctx, true)))
                         .then(Commands.literal("off").executes(ctx -> setMaintenance(ctx, false)))
                         .then(Commands.literal("toggle").executes(OnterCommand::toggleMaintenance))
                         .then(Commands.literal("status").executes(OnterCommand::showMaintenanceStatus)))
                 .then(Commands.literal("broadcast")
+                        .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_BROADCAST, 2))
                         .then(Commands.argument("message", StringArgumentType.greedyString())
                                 .executes(OnterCommand::executeBroadcast)))
                 .then(Commands.literal("reload")
+                        .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_RELOAD, 2))
                         .executes(OnterCommand::executeReload));
 
         dispatcher.register(onterNode);
-        dispatcher.register(Commands.literal("oc").requires(source -> source.hasPermission(2)).redirect(onterNode.build()));
+        dispatcher.register(Commands.literal("oc")
+                .requires(source -> com.onter.ontercore.core.permission.ModPermissions.check(source, com.onter.ontercore.core.permission.ModPermissions.COMMAND_BASE, 2))
+                .redirect(onterNode.build()));
     }
 
     private static int showHelp(CommandContext<CommandSourceStack> context) {

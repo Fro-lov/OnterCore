@@ -14,10 +14,11 @@ public class AnnouncementTicker {
     private static int tickCounter = 0;
     private static int currentIndex = 0;
     private static final Random RANDOM = new Random();
+    private static boolean manualOverrideEnabled = true;
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent.Post event) {
-        if (!OnterConfig.INSTANCE.broadcasterEnabled.get()) {
+        if (!isBroadcastingActive()) {
             return;
         }
 
@@ -31,6 +32,21 @@ public class AnnouncementTicker {
             tickCounter = 0;
             broadcastNextMessage(server);
         }
+    }
+
+    public static boolean isBroadcastingActive() {
+        return manualOverrideEnabled && OnterConfig.INSTANCE.broadcasterEnabled.get();
+    }
+
+    public static boolean toggleBroadcasting() {
+        manualOverrideEnabled = !manualOverrideEnabled;
+        return manualOverrideEnabled;
+    }
+
+    public static int getTimeRemainingSeconds() {
+        int intervalSeconds = Math.max(10, OnterConfig.INSTANCE.broadcasterIntervalSeconds.get());
+        int passedSeconds = tickCounter / 20;
+        return Math.max(0, intervalSeconds - passedSeconds);
     }
 
     public static void broadcastNextMessage(MinecraftServer server) {
@@ -50,6 +66,15 @@ public class AnnouncementTicker {
             currentIndex = (currentIndex + 1) % messages.size();
         }
 
+        sendFormattedBroadcast(server, message);
+    }
+
+    public static void sendCustomBroadcast(MinecraftServer server, String rawMessage) {
+        sendFormattedBroadcast(server, rawMessage);
+    }
+
+    private static void sendFormattedBroadcast(MinecraftServer server, String message) {
+        if (server == null) return;
         String prefix = OnterConfig.INSTANCE.broadcasterPrefix.get();
         String fullFormatted = (prefix + message).replace("&", "§");
         Component component = Component.literal(fullFormatted);

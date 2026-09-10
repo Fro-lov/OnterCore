@@ -21,6 +21,7 @@ public class PlayerDossier {
     private final float lastHealth;
     private final boolean isCurrentlyOnline;
     private final List<CommandLogEntry> recentCommands = new ArrayList<>();
+    private final List<SessionLogEntry> recentSessions = new ArrayList<>();
     private int totalDeaths;
 
     public PlayerDossier(UUID uuid, String username, Timestamp firstJoin, Timestamp lastJoin, Timestamp lastLeave,
@@ -57,6 +58,7 @@ public class PlayerDossier {
     public float getLastHealth() { return lastHealth; }
     public boolean isCurrentlyOnline() { return isCurrentlyOnline; }
     public List<CommandLogEntry> getRecentCommands() { return recentCommands; }
+    public List<SessionLogEntry> getRecentSessions() { return recentSessions; }
     public int getTotalDeaths() { return totalDeaths; }
     public void setTotalDeaths(int totalDeaths) { this.totalDeaths = totalDeaths; }
 

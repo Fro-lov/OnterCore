@@ -4,6 +4,7 @@ import com.onter.ontercore.config.OnterConfig;
 import com.onter.ontercore.core.database.DatabaseManager;
 import com.onter.ontercore.core.database.models.CommandLogEntry;
 import com.onter.ontercore.core.database.models.PlayerDossier;
+import com.onter.ontercore.core.database.models.SessionLogEntry;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -248,6 +251,9 @@ public class PlayerDossierService {
                         // Load recent commands
                         loadRecentCommands(connection, uuid.toString(), dossier);
 
+                        // Load recent sessions
+                        loadRecentSessions(connection, uuid.toString(), dossier);
+
                         // Load total deaths
                         loadTotalDeaths(connection, uuid.toString(), dossier);
 
@@ -261,9 +267,42 @@ public class PlayerDossierService {
         });
     }
 
+    public static CompletableFuture<List<CommandLogEntry>> fetchCommandHistory(String nameOrUuid, int limit) {
+        return DatabaseManager.queryAsync(connection -> {
+            List<CommandLogEntry> list = new ArrayList<>();
+            String sql = """
+                SELECT server_name, command, dimension, x, y, z, created_at
+                FROM onter_command_logs
+                WHERE player_uuid = ? OR LOWER(username) = LOWER(?)
+                ORDER BY id DESC LIMIT ?;
+            """;
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setString(1, nameOrUuid);
+                ps.setString(2, nameOrUuid);
+                ps.setInt(3, Math.min(100, Math.max(1, limit)));
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        list.add(new CommandLogEntry(
+                                rs.getString("server_name"),
+                                rs.getString("command"),
+                                rs.getString("dimension"),
+                                rs.getDouble("x"),
+                                rs.getDouble("y"),
+                                rs.getDouble("z"),
+                                rs.getTimestamp("created_at")
+                        ));
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("[OnterCore] Error fetching command history for {}: {}", nameOrUuid, e.getMessage());
+            }
+            return list;
+        });
+    }
+
     private static void loadRecentCommands(Connection connection, String playerUuid, PlayerDossier dossier) {
         String sql = """
-            SELECT command, dimension, x, y, z, created_at
+            SELECT server_name, command, dimension, x, y, z, created_at
             FROM onter_command_logs
             WHERE player_uuid = ?
             ORDER BY id DESC LIMIT 5;
@@ -273,12 +312,36 @@ public class PlayerDossierService {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     dossier.getRecentCommands().add(new CommandLogEntry(
+                            rs.getString("server_name"),
                             rs.getString("command"),
                             rs.getString("dimension"),
                             rs.getDouble("x"),
                             rs.getDouble("y"),
                             rs.getDouble("z"),
                             rs.getTimestamp("created_at")
+                    ));
+                }
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private static void loadRecentSessions(Connection connection, String playerUuid, PlayerDossier dossier) {
+        String sql = """
+            SELECT server_name, ip_address, join_time, leave_time, duration_seconds
+            FROM onter_sessions
+            WHERE player_uuid = ?
+            ORDER BY id DESC LIMIT 3;
+        """;
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, playerUuid);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    dossier.getRecentSessions().add(new SessionLogEntry(
+                            rs.getString("server_name"),
+                            rs.getString("ip_address"),
+                            rs.getTimestamp("join_time"),
+                            rs.getTimestamp("leave_time"),
+                            rs.getLong("duration_seconds")
                     ));
                 }
             }

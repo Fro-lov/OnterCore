@@ -6,8 +6,6 @@ import com.onter.ontercore.commands.OnterCommand;
 import com.onter.ontercore.config.OnterConfig;
 import com.onter.ontercore.core.database.DatabaseManager;
 import com.onter.ontercore.core.state.ServerStateManager;
-import com.onter.ontercore.features.admin.commands.GiveKeyCommand;
-import com.onter.ontercore.features.admin.commands.ReloadCommand;
 import com.onter.ontercore.features.analytics.PlayerAnalyticsListener;
 import com.onter.ontercore.features.broadcaster.AnnouncementTicker;
 import com.onter.ontercore.features.telegram.TelegramNotifier;
@@ -81,6 +79,8 @@ public class ontercore {
         NeoForge.EVENT_BUS.register(new PlayerAnalyticsListener());
         NeoForge.EVENT_BUS.register(new AnnouncementTicker());
         NeoForge.EVENT_BUS.register(new ServerStateManager());
+        NeoForge.EVENT_BUS.register(new com.onter.ontercore.features.web.WebQueueService());
+        NeoForge.EVENT_BUS.register(new com.onter.ontercore.features.sync.PlayerInventorySyncService());
 
         modEventBus.addListener(this::addCreative);
 
@@ -122,10 +122,6 @@ public class ontercore {
         
         // Register OnterCore command suite
         OnterCommand.register(dispatcher);
-        
-        // Register admin commands
-        ReloadCommand.register(dispatcher);
-        GiveKeyCommand.register(dispatcher);
     }
 }
 

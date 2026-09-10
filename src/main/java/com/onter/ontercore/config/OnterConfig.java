@@ -51,6 +51,15 @@ public class OnterConfig {
     public final ModConfigSpec.ConfigValue<String> maintenanceKickMessage;
     public final ModConfigSpec.IntValue maintenancePermissionLevel;
 
+    // --- WEB ACTION QUEUE (Website -> Server) ---
+    public final ModConfigSpec.BooleanValue webQueueEnabled;
+    public final ModConfigSpec.IntValue webQueuePollIntervalTicks;
+
+    // --- INVENTORY SYNC (Server -> Website) ---
+    public final ModConfigSpec.BooleanValue inventorySyncEnabled;
+    public final ModConfigSpec.BooleanValue inventorySyncOnLogout;
+    public final ModConfigSpec.IntValue inventorySyncIntervalSeconds;
+
     static {
         Pair<OnterConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(OnterConfig::new);
         SPEC = specPair.getRight();
@@ -142,6 +151,29 @@ public class OnterConfig {
                 .define("kick_message", "&cСервер находится на техническом обслуживании.\n&eПожалуйста, попробуйте подключиться позже!");
         maintenancePermissionLevel = builder.comment("Minimum OP level required to bypass maintenance (default: 2)")
                 .defineInRange("bypass_permission_level", 2, 0, 4);
+        builder.pop();
+
+        // --- WEB ACTION QUEUE (Website -> Server) ---
+        builder.comment("========================================",
+                        " Web Action Queue (Двусторонняя очередь Сайт -> Сервер)",
+                        " Executes commands and actions dispatched from website/admin panel",
+                        "========================================").push("web_queue");
+        
+        webQueueEnabled = builder.comment("Enable polling and execution of actions from MySQL web queue").define("enabled", true);
+        webQueuePollIntervalTicks = builder.comment("Polling interval in server ticks (20 ticks = 1 second)")
+                .defineInRange("poll_interval_ticks", 20, 5, 1200);
+        builder.pop();
+
+        // --- INVENTORY SYNC (Server -> Website) ---
+        builder.comment("========================================",
+                        " Player Inventory & State Sync (Сервер -> Сайт)",
+                        " Serializes player inventories & stats to MySQL JSON for web viewers",
+                        "========================================").push("inventory_sync");
+        
+        inventorySyncEnabled = builder.comment("Enable serializing player inventories and stats to MySQL").define("enabled", true);
+        inventorySyncOnLogout = builder.comment("Save inventory snapshot immediately when player logs out").define("sync_on_logout", true);
+        inventorySyncIntervalSeconds = builder.comment("Periodic inventory snapshot interval in seconds (0 to disable periodic sync)")
+                .defineInRange("sync_interval_seconds", 60, 0, 86400);
         builder.pop();
     }
 }

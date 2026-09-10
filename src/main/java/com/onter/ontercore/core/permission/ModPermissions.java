@@ -25,6 +25,13 @@ public class ModPermissions {
             (player, playerUUID, context) -> player != null && player.hasPermissions(2)
     );
 
+    public static final PermissionNode<Boolean> COMMAND_HISTORY = new PermissionNode<>(
+            ontercore.MODID,
+            "command.history",
+            PermissionTypes.BOOLEAN,
+            (player, playerUUID, context) -> player != null && player.hasPermissions(2)
+    );
+
     public static final PermissionNode<Boolean> COMMAND_STATUS = new PermissionNode<>(
             ontercore.MODID,
             "command.status",
@@ -53,6 +60,13 @@ public class ModPermissions {
             (player, playerUUID, context) -> player != null && player.hasPermissions(2)
     );
 
+    public static final PermissionNode<Boolean> COMMAND_SYNC = new PermissionNode<>(
+            ontercore.MODID,
+            "command.sync",
+            PermissionTypes.BOOLEAN,
+            (player, playerUUID, context) -> player != null && player.hasPermissions(2)
+    );
+
     public static final PermissionNode<Boolean> BYPASS_MAINTENANCE = new PermissionNode<>(
             ontercore.MODID,
             "bypass.maintenance",
@@ -65,10 +79,12 @@ public class ModPermissions {
         event.addNodes(
                 COMMAND_BASE,
                 COMMAND_INFO,
+                COMMAND_HISTORY,
                 COMMAND_STATUS,
                 COMMAND_MAINTENANCE,
                 COMMAND_BROADCAST,
                 COMMAND_RELOAD,
+                COMMAND_SYNC,
                 BYPASS_MAINTENANCE
         );
     }
